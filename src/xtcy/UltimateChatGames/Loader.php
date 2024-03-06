@@ -128,11 +128,11 @@ class Loader extends PluginBase implements Listener
                     },
                 static function (SQLException $exception): void {
                     if ($exception instanceof RecordNotFoundException) {
-                        echo 'Account not found';
+                        Loader::getInstance()->getLogger()->warning('Account not found');
                         return;
                     }
 
-                    echo 'An error occurred while updating the balance.';
+                    Loader::getInstance()->getLogger()->warning('An error occurred while updating the balance.');
                 }
             );
         }
