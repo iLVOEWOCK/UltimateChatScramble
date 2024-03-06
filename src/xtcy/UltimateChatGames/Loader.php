@@ -70,7 +70,7 @@ class Loader extends PluginBase implements Listener
         }
 
         $duration = $this->config->get("settings")["duration"] ?? 60;
-        $this->gameDurationHandler = $this->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($duration): void {
+        $this->gameDurationHandler = $this->getScheduler()->scheduleDelayedTask(new ClosureTask(function (): void {
             if (!$this->wordGuessed) {
                 $messages = $this->msgConfig->getNested("messages.no-winner", []);
                 $this->endGame($messages);
