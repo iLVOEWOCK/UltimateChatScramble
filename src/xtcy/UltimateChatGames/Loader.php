@@ -10,6 +10,7 @@ use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\TaskHandler;
 use pocketmine\utils\Config;
+use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
 use pocketmine\scheduler\ClosureTask;
 
@@ -25,10 +26,11 @@ class Loader extends PluginBase implements Listener
     public bool $gameEnded = false;
     private TaskHandler $gameDurationHandler;
 
-
+    use SingletonTrait;
 
     public function onLoad(): void
     {
+        self::setInstance($this);
         $this->saveResource("config.yml");
         $this->saveResource("messages.yml");
         $this->config = new Config($this->getDataFolder() . "config.yml", Config::YAML);
@@ -79,8 +81,7 @@ class Loader extends PluginBase implements Listener
     public function endGame(array $messages): void
     {
         foreach ($messages as $message) {
-            $formattedMessage = TextFormat::colorize($message);
-            $this->broadcastMessage($formattedMessage);
+            $this->broadcastMessage(TextFormat::colorize($message));
         }
         $this->gameRunning = false;
         $this->gameDurationHandler->cancel();
@@ -123,8 +124,7 @@ class Loader extends PluginBase implements Listener
                 00,
                 static function () use($player, $reward, $config): void {
                     $winnerMessage = $config->getNested("messages.winner", []);
-                    $formattedMessage = TextFormat::colorize(str_replace(["{player}", "{reward}"], [$player->getName(), number_format($reward)], $winnerMessage));
-                    $this->endGame([$formattedMessage]);
+                    Loader::getInstance()->endGame(str_replace(["{player}", "{reward}"], [$player->getName(), number_format($reward)], $winnerMessage));
                     },
                 static function (SQLException $exception): void {
                     if ($exception instanceof RecordNotFoundException) {
